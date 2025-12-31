@@ -8,7 +8,7 @@ set -e  # Exit on error
 
 # Get the project root directory (parent of script directory)
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CLIENT_DIR="$PROJECT_ROOT/client"
+CLIENT_DIR="$PROJECT_ROOT/app"
 BASE_SRC="$CLIENT_DIR/src/java"
 COMMON_SRC="$BASE_SRC/com/ap/chat/common"
 SERVER_SRC="$BASE_SRC/com/ap/chat/server/src/main/java"
