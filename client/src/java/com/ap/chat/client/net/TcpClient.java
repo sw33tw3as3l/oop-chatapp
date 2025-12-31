@@ -14,7 +14,6 @@ public class TcpClient {
     private ConnectionContext ctx;
     private final AtomicBoolean running = new AtomicBoolean(true);
 
-    // requestId -> handler
     private final Map<String, ResponseHandler> pending = new ConcurrentHashMap<>();
 
     public TcpClient(String host, int port) {
