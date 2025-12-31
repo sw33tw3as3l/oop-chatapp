@@ -8,8 +8,10 @@ set -e  # Exit on error
 
 # Get the project root directory (parent of script directory)
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-COMMON_DIR="$PROJECT_ROOT/common"
 CLIENT_DIR="$PROJECT_ROOT/client"
+BASE_SRC="$CLIENT_DIR/src/java"
+COMMON_SRC="$BASE_SRC/com/ap/chat/common"
+CLIENT_SRC="$BASE_SRC/com/ap/chat/client"
 HOST="${1:-127.0.0.1}"
 PORT="${2:-5555}"
 
@@ -26,12 +28,10 @@ fi
 
 # Create build directories
 echo "Creating build directories..."
-mkdir -p "$COMMON_DIR/build/classes"
 mkdir -p "$CLIENT_DIR/build/classes"
 
 # Compile common module
 echo "Compiling common module..."
-COMMON_SRC="$COMMON_DIR/src/java"
 if [ ! -d "$COMMON_SRC" ]; then
     echo "Error: Common source directory not found: $COMMON_SRC"
     exit 1
@@ -43,7 +43,7 @@ if [ -z "$JAVA_FILES" ]; then
     exit 1
 fi
 
-javac -d "$COMMON_DIR/build/classes" -sourcepath "$COMMON_SRC" $JAVA_FILES 2>&1 | grep -v "^Note:" || true
+javac -d "$CLIENT_DIR/build/classes" -sourcepath "$BASE_SRC" $JAVA_FILES 2>&1 | grep -v "^Note:" || true
 
 if [ $? -ne 0 ]; then
     echo "Error: Failed to compile common module"
@@ -55,20 +55,19 @@ echo ""
 
 # Compile client module
 echo "Compiling client module..."
-CLIENT_SRC="$CLIENT_DIR/src/java"
 if [ ! -d "$CLIENT_SRC" ]; then
     echo "Error: Client source directory not found: $CLIENT_SRC"
     exit 1
 fi
 
-CLASSPATH="$COMMON_DIR/build/classes:$CLIENT_DIR/build/classes"
+CLASSPATH="$CLIENT_DIR/build/classes"
 JAVA_FILES=$(find "$CLIENT_SRC" -name "*.java")
 if [ -z "$JAVA_FILES" ]; then
     echo "Error: No Java files found in $CLIENT_SRC"
     exit 1
 fi
 
-javac -d "$CLIENT_DIR/build/classes" -sourcepath "$CLIENT_SRC" -cp "$CLASSPATH" $JAVA_FILES 2>&1 | grep -v "^Note:" || true
+javac -d "$CLIENT_DIR/build/classes" -sourcepath "$BASE_SRC" -cp "$CLASSPATH" $JAVA_FILES 2>&1 | grep -v "^Note:" || true
 
 if [ $? -ne 0 ]; then
     echo "Error: Failed to compile client module"
@@ -84,5 +83,5 @@ echo "Connecting to server at $HOST:$PORT"
 echo ""
 
 cd "$CLIENT_DIR"
-java -cp "$CLIENT_DIR/build/classes:$COMMON_DIR/build/classes" com.ap.chat.client.app.ClientMain "$HOST" "$PORT"
+java -cp "$CLIENT_DIR/build/classes" com.ap.chat.client.app.ClientMain "$HOST" "$PORT"
 
