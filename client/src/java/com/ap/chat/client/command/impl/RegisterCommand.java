@@ -11,6 +11,7 @@ import com.ap.chat.common.util.Validation;
 public class RegisterCommand implements ClientCommand {
     @Override
     public void execute(String[] args, ClientContext ctx, TcpClient client) throws Exception {
+        // check the usage of Register
         if (args.length < 1) {
             System.out.println("Usage: /register <username>");
             return;
